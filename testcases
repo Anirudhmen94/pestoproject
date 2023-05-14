@@ -1,0 +1,79 @@
+const { expect } = require("chai");
+
+describe("SupplyChain", function() {
+  let SupplyChain;
+  let supplyChain;
+
+  beforeEach(async () => {
+    SupplyChain = await ethers.getContractFactory("SupplyChain");
+    supplyChain = await SupplyChain.deploy();
+    await supplyChain.deployed();
+  });
+
+  describe("addProduct", function() {
+    it("should add a new product", async function() {
+      await supplyChain.addProduct("Test Product", 10, 100);
+      const product = await supplyChain.products(1);
+
+      expect(product.name).to.equal("Test Product");
+      expect(product.quantity).to.equal(10);
+      expect(product.price).to.equal(100);
+      expect(product.shipped).to.be.false;
+      expect(product.delivered).to.be.false;
+      expect(product.invoiceId).to.equal(0);
+      expect(product.paid).to.be.false;
+    });
+  });
+
+  describe("shipProduct", function() {
+    it("should ship a product", async function() {
+      await supplyChain.addProduct("Test Product", 10, 100);
+      await supplyChain.shipProduct(1);
+      const product = await supplyChain.products(1);
+
+      expect(product.shipped).to.be.true;
+      expect(product.invoiceId).to.equal(1);
+    });
+
+    it("should revert if the product has already been shipped", async function() {
+      await supplyChain.addProduct("Test Product", 10, 100);
+      await supplyChain.shipProduct(1);
+
+      await expect(supplyChain.shipProduct(1)).to.be.revertedWith("Product has already been shipped");
+    });
+
+    it("should revert if the product has already been delivered", async function() {
+      await supplyChain.addProduct("Test Product", 10, 100);
+      await supplyChain.shipProduct(1);
+      await supplyChain.deliverProduct(1);
+
+      await expect(supplyChain.shipProduct(1)).to.be.revertedWith("Product has already been delivered");
+    });
+  });
+
+  describe("deliverProduct", function() {
+    it("should deliver a product", async function() {
+      await supplyChain.addProduct("Test Product", 10, 100);
+      await supplyChain.shipProduct(1);
+      await supplyChain.deliverProduct(1);
+      const product = await supplyChain.products(1);
+
+      expect(product.delivered).to.be.true;
+      expect(product.paid).to.be.true;
+    });
+
+    it("should revert if the product has not been shipped yet", async function() {
+      await supplyChain.addProduct("Test Product", 10, 100);
+
+      await expect(supplyChain.deliverProduct(1)).to.be.revertedWith("Product has not been shipped yet");
+    });
+
+    it("should revert if the product has already been delivered", async function() {
+      await supplyChain.addProduct("Test Product", 10, 100);
+      await supplyChain.shipProduct(1);
+      await supplyChain.deliverProduct(1);
+
+      await expect(supplyChain.deliverProduct(1)).to.be.revertedWith("Product has already been delivered");
+    });
+  });
+});
