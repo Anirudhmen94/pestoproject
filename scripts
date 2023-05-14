@@ -1,16 +1,17 @@
-const { ethers } = require("ethers");
+const { ethers } = require("hardhat");
 
 async function main() {
-  const provider = new ethers.providers.JsonRpcProvider(); // Use your preferred provider here
-  const signer = provider.getSigner(); // Use your preferred signer here
+  const [deployer] = await ethers.getSigners();
 
-  const SupplyChain = await ethers.getContractFactory("SupplyChain", signer);
+  console.log("Deploying contracts with the account:", deployer.address);
+
+  const SupplyChain = await ethers.getContractFactory("SupplyChain");
   const supplyChain = await SupplyChain.deploy();
 
-  console.log("SupplyChain contract deployed to:", supplyChain.address);
+  console.log("SupplyChain contract address:", supplyChain.address);
 }
 
-main().catch(error => {
+main().then(() => process.exit(0)).catch(error => {
   console.error(error);
-  process.exitCode = 1;
+  process.exit(1);
 });
