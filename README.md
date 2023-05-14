@@ -15,4 +15,6 @@ The "deliverProduct" function is a public function that takes a product ID as an
 
 The "generateInvoice" and "processPayment" functions are private functions that are called by other functions in the contract. "generateInvoice" creates a new invoice for the product by incrementing the "invoiceCount" variable and setting the product's "invoiceId" property. "processPayment" updates the product's "paid" property to true to indicate that payment has been processed.
 
+The requestRefund function allows customers to request a refund for a delivered product within the specified refund deadline. The calculateRefundAmount function calculates the refund amount based on the time elapsed since the product was invoiced and the maximum refund time. The setRefundDeadline function allows the contract owner to change the refund deadline if necessary.
+
 Overall, this contract defines a basic supply chain where products can be added, shipped, delivered, and paid for.
