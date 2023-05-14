@@ -1,0 +1,16 @@
+const { ethers } = require("ethers");
+
+async function main() {
+  const provider = new ethers.providers.JsonRpcProvider(); // Use your preferred provider here
+  const signer = provider.getSigner(); // Use your preferred signer here
+
+  const SupplyChain = await ethers.getContractFactory("SupplyChain", signer);
+  const supplyChain = await SupplyChain.deploy();
+
+  console.log("SupplyChain contract deployed to:", supplyChain.address);
+}
+
+main().catch(error => {
+  console.error(error);
+  process.exitCode = 1;
+});
